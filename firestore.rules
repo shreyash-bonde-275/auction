@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isMember() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/members/$(request.auth.uid));
+    }
+
+    function myTeamId() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid)).data.teamId;
+    }
+
+    // ---------- Bid validation (the core rule) ----------
+    // Runs when a team updates auction_state/current.
+    function validBid() {
+      let old = resource.data;
+      let neu = request.resource.data;
+      let teamId = myTeamId();
+      let team = get(/databases/$(database)/documents/teams/$(teamId)).data;
+      let ownedKey = teamId + '_' + old.categoryId;
+
+      return
+        // bidding must be open
+        old.biddingOpen == true
+        // only bid-related fields may change
+        && neu.diff(old).affectedKeys().hasOnly(
+             ['highestBid', 'highestBidderId', 'highestBidderName', 'bidCount', 'updatedAt'])
+        // bidder identity can't be faked
+        && neu.highestBidderId == teamId
+        && neu.highestBidderName == team.name
+        // can't outbid yourself
+        && old.highestBidderId != teamId
+        // exactly one new bid
+        && neu.bidCount == old.bidCount + 1
+        && neu.highestBid is int
+        // first bid >= base price, later bids >= current + increment
+        && neu.highestBid >= (old.bidCount == 0
+              ? old.basePrice
+              : old.highestBid + old.minIncrement)
+        // cannot exceed remaining budget
+        && neu.highestBid <= team.remaining
+        // one tool per category: blocked if already owns one here
+        && !exists(/databases/$(database)/documents/inventory/$(ownedKey))
+        && neu.updatedAt == request.time;
+    }
+
+    // ---------- Admin-only setup data ----------
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false; // create manually in the Firebase console
+    }
+
+    match /teamSecrets/{teamId} {
+      allow read, write: if isAdmin(); // holds the login code
+    }
+
+    match /settings/{doc} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /categories/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /tools/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---------- Teams and login ----------
+    match /teams/{teamId} {
+      allow read: if signedIn();      // budgets are public, IPL style
+      allow write: if isAdmin();      // budget deducted by admin on close
+    }
+
+    // Team "login": links an anonymous uid to a team if the code matches
+    match /members/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['teamId', 'code'])
+        && get(/databases/$(database)/documents/teamSecrets/$(request.resource.data.teamId))
+             .data.code == request.resource.data.code;
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------- Live auction ----------
+    match /auction_state/current {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+      allow update: if isMember() && validBid();
+    }
+
+    match /bids/{bidId} {
+      allow read: if signedIn();
+      allow create: if isAdmin()
+        || (isMember()
+            && request.resource.data.teamId == myTeamId()
+            // must be written in the same batch/transaction as the state update
+            && request.resource.data.toolId ==
+                 getAfter(/databases/$(database)/documents/auction_state/current).data.toolId
+            && request.resource.data.amount ==
+                 getAfter(/databases/$(database)/documents/auction_state/current).data.highestBid
+            && request.resource.data.ts == request.time);
+      allow update: if false; // bid log is append-only except for admin cleanup
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Inventory ----------
+    // Doc ID = teamId + '_' + categoryId, so the "one per category"
+    // rule can be checked with a simple exists().
+    match /inventory/{key} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
