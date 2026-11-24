@@ -1,0 +1,57 @@
+.current-tool {
+  --tool-name-size: 30px;
+  --tool-price-size: 64px;
+  --tool-price-color: var(--goldtxt);
+}
+
+.price {
+  font-family: Oswald, Impact, sans-serif;
+  font-weight: 700;
+  font-size: var(--tool-price-size);
+  line-height: 1;
+  color: var(--tool-price-color);
+}
+
+.tool {
+  font-family: Oswald, Impact, sans-serif;
+  font-size: var(--tool-name-size);
+  font-weight: 700;
+}
+
+.big {
+  --tool-big-price-size: min(22vw, 150px);
+  --tool-big-name-size: min(9vw, 56px);
+
+  text-align: center;
+  padding: 30px 14px;
+}
+
+.big .price {
+  font-size: var(--tool-big-price-size);
+}
+
+.big .tool {
+  font-size: var(--tool-big-name-size);
+}
+
+@media (max-width: 600px) {
+  .price {
+    font-size: clamp(44px, 18vw, 64px);
+  }
+
+  .tool {
+    font-size: clamp(20px, 7vw, 30px);
+  }
+
+  .big {
+    padding: 24px 8px;
+  }
+
+  .big .price {
+    font-size: clamp(56px, 24vw, 150px);
+  }
+
+  .big .tool {
+    font-size: clamp(24px, 9vw, 56px);
+  }
+}

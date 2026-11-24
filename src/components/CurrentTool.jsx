@@ -1,9 +1,10 @@
 import { money } from "../lib/auction";
+import "./CurrentTool.css";
 
 export default function CurrentTool({ state, big = false }) {
   if (!state) {
     return (
-      <div className={big ? "card big" : ""}>
+      <div className={big ? "card current-tool big" : "current-tool"}>
         <span className="mute">Waiting for the auctioneer to start.</span>
       </div>
     );
@@ -14,7 +15,7 @@ export default function CurrentTool({ state, big = false }) {
     : lead ? `Highest bidder: ${state.highestBidderName}` : "Open for bids";
 
   return (
-    <div className={big ? "card big" : ""}>
+    <div className={big ? "card current-tool big" : "current-tool"}>
       <div className="mute">{state.round === "resale" ? "Resale round" : "Now on the block"}</div>
       <div className="tool">{state.toolName}</div>
       <div className="price">{money(lead ? state.highestBid : state.basePrice)}</div>

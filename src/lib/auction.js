@@ -43,9 +43,15 @@ export async function placeBid(team, amount) {
   const bidRef = doc(collection(db, "bids"));
   await runTransaction(db, async (tx) => {
     const s = (await tx.get(stateRef())).data();
+    const teamSnapshot = await tx.get(doc(db, "teams", team.id));
+    if (!teamSnapshot.exists())
+      throw new Error("Team no longer exists.");
+    const remaining = Number(teamSnapshot.data().remaining);
     if (!s.biddingOpen) throw new Error("Bidding is closed.");
     if (!Number.isInteger(amount) || amount < nextMinimum(s))
       throw new Error("Bid is too low.");
+    if (amount > remaining)
+      throw new Error("Bid cannot exceed your remaining budget.");
     tx.update(stateRef(), {
       highestBid: amount,
       highestBidderId: team.id,

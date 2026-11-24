@@ -1,0 +1,7 @@
+.summary-page {
+  --summary-heading-spacing: 0;
+}
+
+.summary-page .card-heading h3 {
+  margin-top: var(--summary-heading-spacing);
+}

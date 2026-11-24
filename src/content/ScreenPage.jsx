@@ -4,6 +4,7 @@ import { useCollection } from "../hooks/useQuery";
 import { useAuctionState } from "../hooks/useAuctionState";
 import CurrentTool from "../components/CurrentTool";
 import BidLog from "../components/BidLog";
+import "./ScreenPage.css";
 
 export default function ScreenPage() {
   const user = useViewer();
@@ -11,7 +12,7 @@ export default function ScreenPage() {
   const bids = useCollection("bids", [orderBy("ts", "desc"), limit(6)], "screen", !!user);
 
   return (
-    <div className="page">
+    <div className="page screen-page">
       <CurrentTool state={state} big />
       <BidLog bids={bids} count={6} />
     </div>

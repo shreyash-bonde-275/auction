@@ -1,0 +1,5 @@
+.screen-page {
+  --screen-page-min-height: 200px;
+
+  min-height: var(--screen-page-min-height);
+}

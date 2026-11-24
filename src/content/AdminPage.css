@@ -1,0 +1,66 @@
+.admin-page {
+  --admin-delete-color: var(--bad);
+  --admin-delete-gap: 8px;
+  --admin-row-gap: 10px;
+}
+
+.manage-row {
+  align-items: center;
+  min-width: 0;
+}
+
+.manage-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.manage-actions button {
+  margin: 2px;
+}
+
+.delete-confirmation {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--admin-delete-gap);
+  max-width: 100%;
+  margin-left: auto;
+}
+
+.delete-confirmation span {
+  flex: 1 1 280px;
+  min-width: 0;
+  text-align: left;
+  color: var(--admin-delete-color);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .manage-row,
+  .delete-confirmation {
+    width: 100%;
+  }
+
+  .manage-row {
+    flex-wrap: wrap;
+  }
+
+  .manage-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .manage-actions button,
+  .delete-confirmation button {
+    flex: 1 1 140px;
+  }
+
+  .delete-confirmation span {
+    flex-basis: 100%;
+  }
+}

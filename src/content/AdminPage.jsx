@@ -11,6 +11,7 @@ import AdminControls from "../components/AdminControls";
 import BidLog from "../components/BidLog";
 import TeamBoard from "../components/TeamBoard";
 import Tabs from "../components/Tabs";
+import "./AdminPage.css";
 
 export default function AdminPage() {
   const { user, ready } = useAuth();
@@ -28,7 +29,7 @@ export default function AdminPage() {
   if (!ready) return null;
 
   return (
-    <div className="page">
+    <div className="page admin-page">
       <h1>Auction admin</h1>
       <Tabs />
       {!isAdmin ? (

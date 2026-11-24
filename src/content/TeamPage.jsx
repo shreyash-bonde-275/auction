@@ -9,6 +9,7 @@ import BudgetBar from "../components/BudgetBar";
 import CurrentTool from "../components/CurrentTool";
 import BidBox from "../components/BidBox";
 import InventoryList from "../components/InventoryList";
+import "./TeamPage.css";
 
 export default function TeamPage() {
   const user = useViewer();
@@ -49,13 +50,13 @@ export default function TeamPage() {
 
   if (!user || !checked)
     return (
-      <div className="page">
+      <div className="page team-page">
         <span className="mute">Loading…</span>
       </div>
     );
 
   return (
-    <div className="page">
+    <div className="page team-page">
       <div className="team-page-header">
         <h1>Auction</h1>
         {teamId && team && (

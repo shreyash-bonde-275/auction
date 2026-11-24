@@ -1,0 +1,43 @@
+.team-page {
+  --team-header-gap: 12px;
+  --team-leave-padding: 8px;
+  --team-leave-border: var(--line);
+}
+
+.team-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--team-header-gap);
+}
+
+.team-page-header h1 {
+  margin-bottom: 8px;
+}
+
+.leave-team {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--team-leave-padding);
+  margin: 0 0 8px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--team-leave-border);
+}
+
+.team-page {
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .team-page-header h1 {
+    margin-bottom: 0;
+  }
+
+  .leave-team {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+  }
+}

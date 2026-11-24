@@ -4,6 +4,7 @@ import { useCollection, useDocument } from "../hooks/useQuery";
 import { byOrder, resetAuction } from "../lib/auction";
 import TeamBoard from "../components/TeamBoard";
 import Tabs from "../components/Tabs";
+import "./SummaryPage.css";
 
 export default function SummaryPage() {
   const user = useViewer();
@@ -35,7 +36,7 @@ export default function SummaryPage() {
   }
 
   return (
-    <div className="page">
+    <div className="page summary-page">
       <h1>Final summary</h1>
       <Tabs />
       {error && <div className="err" role="alert">{error}</div>}

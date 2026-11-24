@@ -7,10 +7,15 @@ export default function BidBox({ state, team, ownsInCategory }) {
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const why = bidBlockReason(state, team, ownsInCategory);
+  const overBudget =
+    Number.isFinite(Number(amount)) && Number(amount) > team.remaining;
+  const reason = overBudget
+    ? "The bid cannot exceed your remaining budget."
+    : why || msg;
 
   useEffect(() => {
-    setAmount(min);
-  }, [min, state.toolId]);
+    setAmount(Math.min(min, team.remaining));
+  }, [min, state.toolId, team.remaining]);
 
   async function submit() {
     setMsg("");
@@ -32,14 +37,14 @@ export default function BidBox({ state, team, ownsInCategory }) {
         inputMode="numeric"
         value={amount}
         min={min}
+        max={team.remaining}
         onChange={(e) => setAmount(e.target.value)}
         disabled={!!why}
-        style={{ width: 150 }}
       />
-      <button onClick={submit} disabled={!!why || busy}>
+      <button onClick={submit} disabled={!!why || overBudget || busy}>
         Place bid
       </button>
-      <div className="err">{why || msg}</div>
+      <div className="err">{reason}</div>
     </div>
   );
 }
